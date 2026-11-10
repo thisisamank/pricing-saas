@@ -1,0 +1,97 @@
+{
+  "product": { "name": "Example Forms", "date": "1 January 2030" },
+  "summary": "This is an example. Responses cost very little. Payment fees are the largest cost for a small customer. Team and Enterprise bring most of the profit.",
+  "primaryPlan": "starter",
+  "retentionMonths": 12,
+  "display": { "symbol": "$" },
+  "meters": {
+    "requests": { "label": "Web requests", "vendor": "Hosting", "free": 1000000, "rate": 0.0000006 },
+    "rows_written": { "label": "Rows written", "vendor": "Database", "free": 5000000, "rate": 0.000001 },
+    "db_gb": { "label": "Database storage (GB)", "vendor": "Database", "free": 8, "rate": 0.125, "accumulate": true },
+    "files_gb": { "label": "File storage (GB)", "vendor": "Storage", "rate": 0.023, "accumulate": true },
+    "emails": { "label": "Emails", "vendor": "Email", "free": 3000, "rate": 0.001 },
+    "events": { "label": "Analytics events", "vendor": "Analytics", "tiers": [[1000000, 0], [9000000, 0.00005], [null, 0.00002]] }
+  },
+  "units": [
+    {
+      "key": "response",
+      "label": "form response",
+      "plural": "form responses",
+      "definition": "One person submits one form. The owner gets one email.",
+      "uses": { "requests": 8, "rows_written": 12, "emails": 1, "events": 4, "db_gb": 0.000004, "files_gb": 0.0002 }
+    },
+    {
+      "key": "export",
+      "label": "report export",
+      "plural": "report exports",
+      "definition": "The owner makes one PDF report of the responses.",
+      "uses": { "requests": 40, "rows_written": 2, "emails": 1, "events": 2, "files_gb": 0.001 }
+    }
+  ],
+  "perActiveUser": { "requests": 200, "events": 30, "emails": 1 },
+  "perRegisteredUser": { "requests": 20 },
+  "fixedCosts": [
+    { "label": "Hosting plan", "monthly": 20 },
+    { "label": "Database plan", "monthly": 25 },
+    { "label": "Domain", "monthly": 1.25 }
+  ],
+  "revenue": {
+    "lossPerCustomer": 0.1,
+    "markets": [
+      { "key": "us", "label": "US", "share": 0.6, "perBase": 1, "taxRate": 0, "feePct": 0.034, "feeFixed": 0.3 },
+      { "key": "eu", "label": "Europe", "share": 0.4, "perBase": 1, "taxRate": 0.2, "feePct": 0.039, "feeFixed": 0.3 }
+    ]
+  },
+  "plans": [
+    {
+      "key": "free", "name": "Free", "free": true, "who": "100 responses each month for 1 person.",
+      "normal": { "response": 20, "export": 1 }, "heavy": { "response": 60, "export": 3 }, "limits": { "response": 100, "export": 5 }
+    },
+    {
+      "key": "starter", "name": "Starter", "priceLabel": "$19", "listPrice": 19, "period": "each month", "who": "For one business owner.",
+      "prices": { "us": 19, "eu": 19 },
+      "normal": { "response": 300, "export": 10 }, "heavy": { "response": 800, "export": 30 }, "limits": { "response": 1000, "export": 50 },
+      "points": ["1,000 responses each month", "50 report exports", "Your logo on forms"]
+    },
+    {
+      "key": "team", "name": "Team", "priceLabel": "$79", "listPrice": 79, "period": "each month", "who": "For teams of up to 10 people.", "highlight": true,
+      "prices": { "us": 79, "eu": 79 },
+      "normal": { "response": 2000, "export": 60 }, "heavy": { "response": 7000, "export": 150 }, "limits": { "response": 10000, "export": 300 },
+      "points": ["10,000 responses each month", "300 report exports", "10 people"]
+    },
+    {
+      "key": "enterprise", "name": "Enterprise", "quoted": true, "quote": 499, "keepShare": 0.9, "priceLabel": "Custom", "listPrice": 399, "period": "Yearly contract", "who": "For companies that need no limits.",
+      "normal": { "response": 20000, "export": 300 }, "limits": { "response": 200000, "export": 3000 },
+      "points": ["Unlimited responses", "Audit logs", "Single sign-on"]
+    }
+  ],
+  "mix": { "starter": 0.8, "team": 0.2 },
+  "scenarios": [
+    { "label": "Normal use", "payingShare": 0.01, "freeActive": 0.3, "usage": "normal" },
+    { "label": "Heavy use", "payingShare": 0.01, "freeActive": 0.6, "usage": "heavy" },
+    { "label": "All limits", "payingShare": 0.01, "freeActive": 1, "usage": "limits" }
+  ],
+  "lowSales": { "shares": [0.01, 0.005], "freeActive": 0.3 },
+  "goals": [{ "label": "Earn $5,000 each month", "amount": 5000 }],
+  "value": {
+    "volumeLabel": "Forms handled",
+    "examples": [
+      { "label": "Small business", "plan": "starter", "volume": 300, "minutes": 4, "hourly": 25, "direct": 0, "revenueGain": 0, "usage": { "response": 300, "export": 10 } },
+      { "label": "Mid-size company", "plan": "enterprise", "volume": 20000, "minutes": 3, "hourly": 30, "direct": 0, "revenueGain": 0, "usage": { "response": 20000, "export": 300 } }
+    ]
+  },
+  "competitors": [{ "name": "Example rival", "plan": "Pro", "price": "$29 each month", "limit": "1,000 responses" }],
+  "features": [
+    { "group": "Limits", "rows": [["Responses each month", "100", "1,000", "10,000", "Unlimited"], ["People", "1", "1", "10", "Unlimited"]] },
+    { "group": "Control", "rows": [["Your logo", "no", "yes", "yes", "yes"], ["Audit logs", "no", "no", "no", "yes"], ["Single sign-on", "no", "no", "no", "soon"]] }
+  ],
+  "recommendations": [
+    { "title": "Keep the Starter limit for sales reasons.", "detail": "A response costs less than one cent." },
+    { "title": "Quote Enterprise from value.", "detail": "Charge one third of the value, and never less than the lowest price." }
+  ],
+  "evidence": [
+    { "what": "All numbers in this example", "type": "assumption", "source": "This file is an example." }
+  ],
+  "excluded": "Not in these numbers: salaries, customer support, and income tax.",
+  "sources": [{ "label": "Example vendor price page", "url": "https://example.com/pricing" }]
+}

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit economics</title>
+<style>
+:root { --bg: #fafafa; --card: #ffffff; --ink: #18181b; --muted: #63636b; --line: #e4e4e7; --accent: #3b5bdb; --accent-soft: #e7ecfd; --good: #16794a; --good-soft: #dff5e9; --bad: #b42318; --bad-soft: #fde8e6; --warn: #92600a; --warn-soft: #fbf0d9; --gray-soft: #efeff1; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0c0d10; --card: #15161a; --ink: #f2f2f4; --muted: #a0a0aa; --line: #2a2b31; --accent: #8ea4f5; --accent-soft: #1f2748; --good: #5fd39a; --good-soft: #12321f; --bad: #f58f85; --bad-soft: #3a1714; --warn: #eabf6a; --warn-soft: #352809; --gray-soft: #24252b; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif; }
+main { max-width: 960px; margin: 0 auto; padding: 56px 16px 96px; }
+h1 { margin: 0; font-size: clamp(32px, 5vw, 44px); line-height: 1.1; letter-spacing: -0.03em; }
+h2 { margin: 56px 0 8px; font-size: 24px; letter-spacing: -0.02em; line-height: 1.25; }
+h3 { margin: 32px 0 8px; font-size: 18px; }
+p { margin: 0 0 12px; }
+[hidden] { display: none !important; }
+main { counter-reset: section; }
+h2:not(.plain)::before { counter-increment: section; content: counter(section) ". "; }
+.sub { margin-top: 12px; color: var(--muted); font-size: 18px; }
+.lead { color: var(--muted); }
+.small { font-size: 14px; color: var(--muted); margin-top: 10px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 32px; }
+.stat, .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.stat { padding: 16px; }
+.stat b { display: block; font-size: 28px; line-height: 1.2; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stat > span { display: block; font-size: 14px; color: var(--muted); }
+.stat em { display: block; margin-bottom: 8px; font-style: normal; font-size: 14px; font-weight: 600; }
+.answer { margin-top: 16px; padding: 16px; background: var(--accent-soft); border-radius: 12px; font-weight: 600; }
+.panel { padding: 20px; margin-top: 16px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+th, td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+thead th { color: var(--muted); font-size: 13px; font-weight: 600; }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+tbody th { font-weight: 600; }
+td.n, th.n { text-align: right; white-space: nowrap; padding-right: 0; padding-left: 12px; }
+dl { display: grid; grid-template-columns: minmax(0, 170px) minmax(0, 1fr); gap: 10px 20px; margin: 0; }
+dt { font-weight: 600; }
+dd { margin: 0; color: var(--muted); }
+.flow { display: grid; gap: 10px; }
+.flow-row { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr) 76px; gap: 12px; align-items: center; font-size: 15px; }
+.flow-row strong { text-align: right; font-variant-numeric: tabular-nums; }
+.track { height: 22px; border-radius: 5px; background: var(--gray-soft); overflow: hidden; }
+.fill { display: block; height: 100%; }
+.fill.pay { background: var(--accent); }
+.fill.minus { background: var(--bad); }
+.fill.keep { background: var(--good); }
+.mini { display: inline-block; width: 110px; height: 8px; border-radius: 4px; background: var(--gray-soft); overflow: hidden; vertical-align: middle; }
+.mini i { display: block; height: 100%; background: var(--accent); }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.tag.m { color: var(--good); background: var(--good-soft); }
+.tag.v { color: var(--accent); background: var(--accent-soft); }
+.tag.e { color: var(--warn); background: var(--warn-soft); }
+.tag.a { color: var(--bad); background: var(--bad-soft); }
+.pos { color: var(--good); font-weight: 600; }
+.neg { color: var(--bad); font-weight: 600; }
+.calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+.calc label { display: grid; gap: 4px; align-content: start; font-size: 14px; font-weight: 600; }
+.calc input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: inherit; font: inherit; }
+.result { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 16px; }
+ol, ul { margin: 0; padding-left: 20px; }
+li { margin-bottom: 10px; }
+a { color: var(--accent); }
+.note { padding: 12px 16px; border-radius: 10px; background: var(--warn-soft); font-size: 15px; }
+.tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 16px; }
+.tier { display: flex; flex-direction: column; gap: 6px; padding: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.tier.pick { border: 2px solid var(--accent); }
+.tier h3 { margin: 0; }
+.tier .price { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+.tier .for { color: var(--muted); font-size: 14px; }
+.tier ul { margin: 8px 0 0; padding-left: 18px; font-size: 14px; }
+.tier li { margin-bottom: 6px; }
+.free-row { margin-top: 12px; padding: 14px 20px; background: var(--card); border: 1px dashed var(--line); border-radius: 12px; font-size: 15px; }
+.matrix td, .matrix th { text-align: center; }
+.matrix th:first-child, .matrix td:first-child { text-align: left; }
+.matrix .group th { padding-top: 22px; color: var(--accent); font-size: 13px; text-align: left; }
+.yes { color: var(--good); font-weight: 700; }
+.no { color: var(--muted); }
+.soon { color: var(--warn); font-size: 13px; font-weight: 600; }
+@media (max-width: 760px) {
+  main { padding-top: 32px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  dd { margin-bottom: 10px; }
+  .flow-row { grid-template-columns: minmax(0, 1fr) 76px; }
+  .flow-row .track { grid-column: 1 / -1; grid-row: 2; }
+}
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Unit economics</h1>
+  <p class="sub" id="subtitle"></p>
+  <div class="stats" id="stats"></div>
+  <p class="answer" id="answer"></p>
+  <p style="margin-top:16px"><a href="#plans-proposal">Go to the recommended plans</a></p>
+
+  <h2>The words on this page</h2>
+  <div class="panel"><dl id="words"></dl></div>
+
+  <h2>How to set a price</h2>
+  <p class="lead">Do these three checks in this order.</p>
+  <div class="panel">
+    <ol>
+      <li><b>Value comes first.</b> Calculate the money that the product saves or earns for the customer. Charge about one third of it, between 25% and 50%. The customer keeps the rest.</li>
+      <li><b>Cost is only the floor.</b> Do not start with cost, because that makes the price too low. Use cost to find the lowest price that you can accept. Keep a gross margin of 80% to 90%.</li>
+      <li><b>Competition comes last.</b> Do not start a price war. Make your product different, so that a customer cannot compare only the price.</li>
+    </ol>
+  </div>
+
+  <h2>One customer for one month</h2>
+  <p class="lead" id="customer-lead"></p>
+  <div class="panel"><div class="flow" id="flow"></div></div>
+  <div class="panel scroll"><table id="markets"></table></div>
+
+  <h2>What each unit costs</h2>
+  <div id="unit-tables"></div>
+
+  <h2>What each plan costs you in one month</h2>
+  <p class="lead">"Worst case" means that the customer uses every limit and always chooses the most expensive kind of action that the plan allows.</p>
+  <div class="panel scroll"><table id="plans"></table></div>
+  <p class="small" id="break-even"></p>
+
+  <section id="value-section">
+    <h2>What the product is worth to a customer</h2>
+    <p class="lead">Write this calculation with the customer. Ask the customer to check each number.</p>
+    <div class="panel scroll"><table id="value"></table></div>
+    <div class="panel">
+      <div class="calc" id="value-inputs"></div>
+      <div class="result" id="value-result"></div>
+    </div>
+  </section>
+
+  <section id="competition-section">
+    <h2>What competitors charge</h2>
+    <div class="panel scroll"><table id="competition"></table></div>
+  </section>
+
+  <h2>Who can sell each plan</h2>
+  <p class="lead" id="sales-lead"></p>
+  <div class="panel scroll"><table id="sales"></table></div>
+
+  <h2>Your total cost when the product grows</h2>
+  <div class="panel scroll"><table id="scale"></table></div>
+  <p class="small" id="scale-note"></p>
+  <div class="panel scroll"><table id="vendors"></table></div>
+
+  <h2>Try your own numbers</h2>
+  <div class="panel">
+    <div class="calc">
+      <label>Registered users<input id="c-users" type="number" min="1" step="1" value="10000"></label>
+      <label>Users who pay (%)<input id="c-paid" type="number" min="0" max="100" step="0.5" value="1"></label>
+      <label>Free users who are active (%)<input id="c-active" type="number" min="0" max="100" step="5" value="30"></label>
+      <label>Usage compared to normal (1 is normal)<input id="c-mult" type="number" min="0" step="0.5" value="1"></label>
+    </div>
+    <div class="result" id="calc-result"></div>
+  </div>
+
+  <h2 id="plans-proposal">Recommended plans</h2>
+  <p class="lead">This is a recommendation. It is not in the product until you approve it.</p>
+  <div class="tiers" id="tiers"></div>
+  <p class="free-row" id="free-row"></p>
+  <h3>Feature list</h3>
+  <div class="panel scroll"><table class="matrix" id="matrix"></table></div>
+  <p class="small">"Not built" means that the feature does not exist today. Do not promise it to a customer without a date.</p>
+  <h3>If very few users pay</h3>
+  <p class="lead" id="low-lead"></p>
+  <div class="panel scroll"><table id="few"></table></div>
+  <h3>How many customers you need</h3>
+  <p class="lead">This table shows the number of customers of one tier that you need to reach each goal.</p>
+  <div class="panel scroll"><table id="needed"></table></div>
+
+  <h2>Pricing checks</h2>
+  <p class="lead">The calculation makes these checks for each plan.</p>
+  <div class="panel scroll"><table id="checks"></table></div>
+
+  <h2>What to do with these numbers</h2>
+  <div class="panel"><ol id="recommendations"></ol></div>
+
+  <h2>How sure are these numbers?</h2>
+  <div class="panel scroll"><table id="trust"></table></div>
+  <p class="small" id="excluded"></p>
+
+  <h2 class="plain">Sources</h2>
+  <ul class="small" id="sources"></ul>
+</main>
+<script>
+const MODEL = /*__MODEL__*/null;
+/*__ENGINE__*/
+/*__RENDER__*/
+</script>
+</body>
+</html>
